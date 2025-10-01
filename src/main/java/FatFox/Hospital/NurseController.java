@@ -2,7 +2,7 @@ package FatFox.Hospital;
 
 import FatFox.Hospital.Nurse;
 import FatFox.Hospital.NurseService;
-import fatfox.infirmary.InfirmaryApplication;
+
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -22,8 +22,8 @@ public class NurseController {
         return nurseService.searchByName(name);
     }
     
-    @GetMapping("/nurse/index")
-	public ArrayList<Nurse> getAll() {
+    @GetMapping("/nurses/index")
+	public List<Nurse> getAll() {
 		return nurseService.getAllNurses();
 	}
 }
