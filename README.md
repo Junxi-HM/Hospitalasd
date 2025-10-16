@@ -1,0 +1,96 @@
+# Diagrama del modelo relacional — `gestio_sanitaria_hce`
+
+> Basado en el DDL del archivo `hosp.sql`. :contentReference[oaicite:0]{index=0}
+
+```mermaid
+erDiagram
+    %% Entidades y atributos principales (PK = clave primaria, FK = clave foránea)
+    INFERMER {
+      INT ID_INFERMER PK "AUTO_INCREMENT"
+      VARCHAR USUARI "UNIQUE"
+      CHAR PASSWORD_HASH
+      VARCHAR NOM
+      VARCHAR COGNOMS
+      VARCHAR IMATGE_PERFIL
+      DATE DATA_ALTA
+    }
+
+    PACIENT {
+      INT ID_PACIENT PK "AUTO_INCREMENT"
+      VARCHAR N_HISTORIA "UNIQUE"
+      VARCHAR NOM
+      VARCHAR COGNOMS
+      DATE DATA_NAIXEMENT
+      TEXT ALERGIES
+    }
+
+    INGRES {
+      INT ID_INGRES PK "AUTO_INCREMENT"
+      INT ID_PACIENT FK
+      DATETIME DATA_INGRES
+      VARCHAR UNITAT
+      VARCHAR HABITACIO
+      VARCHAR CAMA
+      DATETIME DATA_ALTA
+    }
+
+    CONSTANTS_VITALS {
+      INT ID_CONSTANT PK "AUTO_INCREMENT"
+      INT ID_INGRES FK
+      INT ID_INFERMER FK
+      DATETIME DATA_HORA
+      DECIMAL TEMP_C
+      INT PULSACIONS
+      INT TENSIO_SISTOLICA
+      INT TENSIO_DIASTOLICA
+      TEXT OBSERVACIONS
+      NOTE "UNIQUE (ID_INGRES, DATA_HORA)"
+    }
+
+    OBSERVACIONS_GENERALS {
+      INT ID_OBS PK "AUTO_INCREMENT"
+      INT ID_INGRES FK
+      INT ID_INFERMER FK
+      DATE DATA_DIA
+      DECIMAL PES_KG
+      DECIMAL TALLA_M
+      VARCHAR DIETA
+      VARCHAR OXIGEN
+      INT INDEX_NORTON
+      VARCHAR NIVELL_DEPENDENCIA
+      TEXT ESPECTORACIO
+      INT DEPOSICIONS
+      NOTE "UNIQUE (ID_INGRES, DATA_DIA)"
+    }
+
+    BALANC_ITEMS {
+      INT ID_BALANC_ITEM PK "AUTO_INCREMENT"
+      INT ID_INGRES FK
+      INT ID_INFERMER FK
+      DATETIME DATA_HORA
+      ENUM TIPUS "ENTRADA|SORTIDA"
+      VARCHAR ITEM_DETALL
+      INT VOLUM_ML
+    }
+
+    BALANC_DIARI {
+      INT ID_BALANC_DIARI PK "AUTO_INCREMENT"
+      INT ID_INGRES FK
+      DATE DATA_DIA
+      INT TOTAL_ENTRADES
+      INT TOTAL_SORTIDES
+      INT PERDUES_INSENSIBLES
+      INT BALANC_NET
+      INT BALANC_ACUMULAT
+      NOTE "UNIQUE (ID_INGRES, DATA_DIA)"
+    }
+
+    %% Relaciones (cardinalidad aproximada según DDL)
+    PACIENT ||--o{ INGRES : "tiene/ha tenido"
+    INGRES ||--o{ CONSTANTS_VITALS : "registra"
+    INFERMER ||--o{ CONSTANTS_VITALS : "registra_por"
+    INGRES ||--o{ OBSERVACIONS_GENERALS : "tiene"
+    INFERMER ||--o{ OBSERVACIONS_GENERALS : "registra"
+    INGRES ||--o{ BALANC_ITEMS : "tiene"
+    INFERMER ||--o{ BALANC_ITEMS : "registra"
+    INGRES ||--o{ BALANC_DIARI : "tiene"
