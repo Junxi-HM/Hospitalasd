@@ -1,72 +1,79 @@
-# Diagrama del modelo relacional — `gestio_sanitaria_hce`
+# 🏥 Health Data Management System (Programa de Gestió de Dades Sanitàries)
 
-> Basado en el DDL del archivo `hosp.sql`.
+This project represents the **logical database model** for a healthcare data management system.  
+It allows nurses to register patients, record vital signs, hygiene routines, medications, and diets — all linked to each patient’s clinical history.
 
-```mermaid
-erDiagram
-    %% Entidades y atributos principales (PK = clave primaria, FK = clave foránea)
-    INFERMER {
-      INT ID_INFERMER PK "AUTO_INCREMENT"
-      VARCHAR USUARI "UNIQUE"
-      CHAR PASSWORD_HASH
-      VARCHAR NOM
-      VARCHAR COGNOMS
-      VARCHAR IMATGE_PERFIL
-      DATE DATA_ALTA
-    }
+---
 
-    PACIENT {
-      INT ID_PACIENT PK "AUTO_INCREMENT"
-      VARCHAR N_HISTORIA "UNIQUE"
-      VARCHAR NOM
-      VARCHAR COGNOMS
-      DATE DATA_NAIXEMENT
-      TEXT ALERGIES
-    }
+## 🧩 Logical Model (MySQL)
 
-    INGRES {
-      INT ID_INGRES PK "AUTO_INCREMENT"
-      INT ID_PACIENT FK
-      DATETIME DATA_INGRES
-      VARCHAR UNITAT
-      VARCHAR HABITACIO
-      VARCHAR CAMA
-      DATETIME DATA_ALTA
-    }
+```sql
+CREATE TABLE Infermer (
+    id_infermer INT AUTO_INCREMENT PRIMARY KEY,
+    nom VARCHAR(100) NOT NULL,
+    cognoms VARCHAR(150),
+    email VARCHAR(100) UNIQUE NOT NULL,
+    contrasenya VARCHAR(255) NOT NULL,
+    imatge_perfil VARCHAR(255),
+    data_registre DATETIME DEFAULT CURRENT_TIMESTAMP
+);
 
-    CONSTANTS_VITALS {
-      INT ID_CONSTANT PK "AUTO_INCREMENT"
-      INT ID_INGRES FK
-      INT ID_INFERMER FK
-      DATETIME DATA_HORA
-      DECIMAL TEMP_C
-      INT PULSACIONS
-      INT TENSIO_SISTOLICA
-      INT TENSIO_DIASTOLICA
-      TEXT OBSERVACIONS
-    }
+CREATE TABLE Pacient (
+    id_pacient INT AUTO_INCREMENT PRIMARY KEY,
+    nom VARCHAR(100) NOT NULL,
+    cognoms VARCHAR(150),
+    data_naixement DATE,
+    sexe ENUM('Home','Dona','Altres'),
+    adreca VARCHAR(255),
+    telefon VARCHAR(20),
+    data_ingres DATETIME
+);
 
-    OBSERVACIONS_GENERALS {
-      INT ID_OBS PK "AUTO_INCREMENT"
-      INT ID_INGRES FK
-      INT ID_INFERMER FK
-      DATE DATA_DIA
-      DECIMAL PES_KG
-      DECIMAL TALLA_M
-      VARCHAR DIETA
-      VARCHAR OXIGEN
-      INT INDEX_NORTON
-      VARCHAR NIVELL_DEPENDENCIA
-      TEXT ESPECTORACIO
-      INT DEPOSICIONS
-    }
+CREATE TABLE HistoriaClinica (
+    id_historia INT AUTO_INCREMENT PRIMARY KEY,
+    id_pacient INT NOT NULL,
+    id_infermer INT NOT NULL,
+    data_registre DATETIME DEFAULT CURRENT_TIMESTAMP,
+    observacions TEXT,
+    FOREIGN KEY (id_pacient) REFERENCES Pacient(id_pacient),
+    FOREIGN KEY (id_infermer) REFERENCES Infermer(id_infermer)
+);
 
-    BALANC_ITEMS {
-      INT ID_BALANC_ITEM PK "AUTO_INCREMENT"
-      INT ID_INGRES FK
-      INT ID_INFERMER FK
-      DATETIME DATA_HORA
-      VARCHAR TIPUS
-      VARCHAR ITEM_DETALL
-      INT VOLUM_ML
-    }
+CREATE TABLE ConstantsVitals (
+    id_constant INT AUTO_INCREMENT PRIMARY KEY,
+    id_historia INT NOT NULL,
+    temperatura DECIMAL(4,1),
+    pressio_sistolica INT,
+    pressio_diastolica INT,
+    pulsacions INT,
+    saturacio_oxigen INT,
+    data_mesura DATETIME DEFAULT CURRENT_TIMESTAMP,
+    FOREIGN KEY (id_historia) REFERENCES HistoriaClinica(id_historia)
+);
+
+CREATE TABLE Higiene (
+    id_higiene INT AUTO_INCREMENT PRIMARY KEY,
+    id_historia INT NOT NULL,
+    tipus VARCHAR(100),
+    observacions TEXT,
+    data_registre DATETIME DEFAULT CURRENT_TIMESTAMP,
+    FOREIGN KEY (id_historia) REFERENCES HistoriaClinica(id_historia)
+);
+
+CREATE TABLE Medicacio (
+    id_medicacio INT AUTO_INCREMENT PRIMARY KEY,
+    id_historia INT NOT NULL,
+    nom_medicament VARCHAR(100),
+    dosi VARCHAR(50),
+    via_administracio VARCHAR(50),
+    horari VARCHAR(50),
+    FOREIGN KEY (id_historia) REFERENCES HistoriaClinica(id_historia)
+);
+
+CREATE TABLE Dieta (
+    id_dieta INT AUTO_INCREMENT PRIMARY KEY,
+    id_historia INT NOT NULL,
+    tipus_dieta VARCHAR(100),
+    observacions TEXT,
+    FOREIGN KEY (id_historia) REFERENCES HistoriaClinica(id_historia)
+);
