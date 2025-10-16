@@ -1,79 +1,81 @@
-# 🏥 Health Data Management System (Programa de Gestió de Dades Sanitàries)
+# 🧠 Conceptual Model — Programa de Gestió de Dades Sanitàries
 
-This project represents the **logical database model** for a healthcare data management system.  
-It allows nurses to register patients, record vital signs, hygiene routines, medications, and diets — all linked to each patient’s clinical history.
+This conceptual model describes the main **entities**, their **attributes**, and **relationships** in the healthcare data management system.
 
 ---
 
-## 🧩 Logical Model (MySQL)
+## 🧩 Entities and Attributes
 
-```sql
-CREATE TABLE Infermer (
-    id_infermer INT AUTO_INCREMENT PRIMARY KEY,
-    nom VARCHAR(100) NOT NULL,
-    cognoms VARCHAR(150),
-    email VARCHAR(100) UNIQUE NOT NULL,
-    contrasenya VARCHAR(255) NOT NULL,
-    imatge_perfil VARCHAR(255),
-    data_registre DATETIME DEFAULT CURRENT_TIMESTAMP
-);
+### 👩‍⚕️ Infermer (Nurse)
+- **id_infermer** (PK)
+- nom
+- cognoms
+- email
+- contrasenya
+- imatge_perfil
+- data_registre
 
-CREATE TABLE Pacient (
-    id_pacient INT AUTO_INCREMENT PRIMARY KEY,
-    nom VARCHAR(100) NOT NULL,
-    cognoms VARCHAR(150),
-    data_naixement DATE,
-    sexe ENUM('Home','Dona','Altres'),
-    adreca VARCHAR(255),
-    telefon VARCHAR(20),
-    data_ingres DATETIME
-);
+### 🧍‍♂️ Pacient (Patient)
+- **id_pacient** (PK)
+- nom
+- cognoms
+- data_naixement
+- sexe
+- adreca
+- telefon
+- data_ingres
 
-CREATE TABLE HistoriaClinica (
-    id_historia INT AUTO_INCREMENT PRIMARY KEY,
-    id_pacient INT NOT NULL,
-    id_infermer INT NOT NULL,
-    data_registre DATETIME DEFAULT CURRENT_TIMESTAMP,
-    observacions TEXT,
-    FOREIGN KEY (id_pacient) REFERENCES Pacient(id_pacient),
-    FOREIGN KEY (id_infermer) REFERENCES Infermer(id_infermer)
-);
+### 📘 HistoriaClinica (Clinical History)
+- **id_historia** (PK)
+- id_pacient (FK → Pacient)
+- id_infermer (FK → Infermer)
+- data_registre
+- observacions
 
-CREATE TABLE ConstantsVitals (
-    id_constant INT AUTO_INCREMENT PRIMARY KEY,
-    id_historia INT NOT NULL,
-    temperatura DECIMAL(4,1),
-    pressio_sistolica INT,
-    pressio_diastolica INT,
-    pulsacions INT,
-    saturacio_oxigen INT,
-    data_mesura DATETIME DEFAULT CURRENT_TIMESTAMP,
-    FOREIGN KEY (id_historia) REFERENCES HistoriaClinica(id_historia)
-);
+### ❤️ ConstantsVitals (Vital Signs)
+- **id_constant** (PK)
+- id_historia (FK → HistoriaClinica)
+- temperatura
+- pressio_sistolica
+- pressio_diastolica
+- pulsacions
+- saturacio_oxigen
+- data_mesura
 
-CREATE TABLE Higiene (
-    id_higiene INT AUTO_INCREMENT PRIMARY KEY,
-    id_historia INT NOT NULL,
-    tipus VARCHAR(100),
-    observacions TEXT,
-    data_registre DATETIME DEFAULT CURRENT_TIMESTAMP,
-    FOREIGN KEY (id_historia) REFERENCES HistoriaClinica(id_historia)
-);
+### 🧼 Higiene (Hygiene)
+- **id_higiene** (PK)
+- id_historia (FK → HistoriaClinica)
+- tipus
+- observacions
+- data_registre
 
-CREATE TABLE Medicacio (
-    id_medicacio INT AUTO_INCREMENT PRIMARY KEY,
-    id_historia INT NOT NULL,
-    nom_medicament VARCHAR(100),
-    dosi VARCHAR(50),
-    via_administracio VARCHAR(50),
-    horari VARCHAR(50),
-    FOREIGN KEY (id_historia) REFERENCES HistoriaClinica(id_historia)
-);
+### 💊 Medicacio (Medication)
+- **id_medicacio** (PK)
+- id_historia (FK → HistoriaClinica)
+- nom_medicament
+- dosi
+- via_administracio
+- horari
 
-CREATE TABLE Dieta (
-    id_dieta INT AUTO_INCREMENT PRIMARY KEY,
-    id_historia INT NOT NULL,
-    tipus_dieta VARCHAR(100),
-    observacions TEXT,
-    FOREIGN KEY (id_historia) REFERENCES HistoriaClinica(id_historia)
-);
+### 🍽️ Dieta (Diet)
+- **id_dieta** (PK)
+- id_historia (FK → HistoriaClinica)
+- tipus_dieta
+- observacions
+
+---
+
+## 🔗 Relationships
+
+| Relationship | Type | Description |
+|---------------|------|--------------|
+| **Infermer – HistoriaClinica** | 1 ⟶ N | One nurse can manage many clinical records |
+| **Pacient – HistoriaClinica** | 1 ⟶ N | One patient can have multiple clinical records |
+| **HistoriaClinica – ConstantsVitals** | 1 ⟶ N | Each record can store many vital signs entries |
+| **HistoriaClinica – Higiene** | 1 ⟶ N | Each record can include several hygiene activities |
+| **HistoriaClinica – Medicacio** | 1 ⟶ N | Each record can include multiple medications |
+| **HistoriaClinica – Dieta** | 1 ⟶ N | Each record can define one or more diet plans |
+
+---
+
+📘 *This conceptual model forms the basis for the logical (MySQL) database implementation of the healthcare data management system.*
