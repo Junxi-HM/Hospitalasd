@@ -1,6 +1,6 @@
 # Diagrama del modelo relacional — `gestio_sanitaria_hce`
 
-> Basado en el DDL del archivo `hosp.sql`. :contentReference[oaicite:0]{index=0}
+> Basado en el DDL del archivo `hosp.sql`.
 
 ```mermaid
 erDiagram
@@ -44,7 +44,6 @@ erDiagram
       INT TENSIO_SISTOLICA
       INT TENSIO_DIASTOLICA
       TEXT OBSERVACIONS
-      NOTE "UNIQUE (ID_INGRES, DATA_HORA)"
     }
 
     OBSERVACIONS_GENERALS {
@@ -60,7 +59,6 @@ erDiagram
       VARCHAR NIVELL_DEPENDENCIA
       TEXT ESPECTORACIO
       INT DEPOSICIONS
-      NOTE "UNIQUE (ID_INGRES, DATA_DIA)"
     }
 
     BALANC_ITEMS {
@@ -69,28 +67,4 @@ erDiagram
       INT ID_INFERMER FK
       DATETIME DATA_HORA
       ENUM TIPUS "ENTRADA|SORTIDA"
-      VARCHAR ITEM_DETALL
-      INT VOLUM_ML
-    }
-
-    BALANC_DIARI {
-      INT ID_BALANC_DIARI PK "AUTO_INCREMENT"
-      INT ID_INGRES FK
-      DATE DATA_DIA
-      INT TOTAL_ENTRADES
-      INT TOTAL_SORTIDES
-      INT PERDUES_INSENSIBLES
-      INT BALANC_NET
-      INT BALANC_ACUMULAT
-      NOTE "UNIQUE (ID_INGRES, DATA_DIA)"
-    }
-
-    %% Relaciones (cardinalidad aproximada según DDL)
-    PACIENT ||--o{ INGRES : "tiene/ha tenido"
-    INGRES ||--o{ CONSTANTS_VITALS : "registra"
-    INFERMER ||--o{ CONSTANTS_VITALS : "registra_por"
-    INGRES ||--o{ OBSERVACIONS_GENERALS : "tiene"
-    INFERMER ||--o{ OBSERVACIONS_GENERALS : "registra"
-    INGRES ||--o{ BALANC_ITEMS : "tiene"
-    INFERMER ||--o{ BALANC_ITEMS : "registra"
-    INGRES ||--o{ BALANC_DIARI : "tiene"
+      VARCHAR ITEM_DE_
